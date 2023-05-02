@@ -74,24 +74,40 @@ def process_coins():
     return math.fsum([quarters + dimes + nickles + pennies])
 
 
+def transaction_successful(chosen_drink):
+    inserted_coins = round(process_coins(), 2)
+    chosen_coffee = MENU[chosen_drink]
+    print(f'Inserted Coins: {inserted_coins}  / Coffee Cost: {chosen_coffee["cost"]}')
+
+    if inserted_coins < chosen_coffee["cost"]:
+        return False
+    else:
+        return True
+
+
 def machine_start():
+    global profit
     machine_running = True
 
     while machine_running:
         user_choice = input("What would you like? (espresso/latte/cappuccino): ")
 
         if user_choice == 'off':
+            # Off Feature
             print("Turning off the machine! Have a nice day!")
             machine_running = False
         elif user_choice == 'report':
+            # Report Feature
             print_report(resources, profit)
         else:
+            # Coffe Feature
             if check_resource(resources, user_choice):
-                inserted_coins = process_coins()
-                print(inserted_coins)
+                if transaction_successful(user_choice):
+                    # TODO 7: Make coffee
+                    print("Continue process")
+                else:
+                    print("Sorry that's not enough money. Money refunded")
+                    machine_running = False
 
-            # TODO 6. Check if transaction is successful
-            # TODO 7. Make Coffee
-
-
+# TODO: Possible Bug, no milk ingredients
 machine_start()
