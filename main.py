@@ -1,3 +1,5 @@
+import math
+
 MENU = {
     "espresso": {
         "ingredients": {
@@ -28,7 +30,7 @@ profit = 0
 resources = {
     "water": 300,
     "milk": 200,
-    "coffee": 1,
+    "coffee": 100,
 }
 
 
@@ -61,6 +63,17 @@ def check_resource(resource, user_choice):
         return is_resource_enough(recipe["water"], recipe["milk"], recipe["coffee"], resource)
 
 
+def process_coins():
+    print("Please insert coins: ")
+    quarters = float(input("How many quarters?: ")) * 0.25
+    dimes = float(input("How many dimes?: ")) * 0.1
+    nickles = float(input("How many nickles?: ")) * 0.05
+    pennies = float(input("How many pennies?: ")) * 0.01
+    # Comment this out
+    print(f"{quarters} + {dimes} + {nickles} + {pennies}")
+    return math.fsum([quarters + dimes + nickles + pennies])
+
+
 def machine_start():
     machine_running = True
 
@@ -74,9 +87,9 @@ def machine_start():
             print_report(resources, profit)
         else:
             if check_resource(resources, user_choice):
-                print("Nice Resource is enough!")
+                inserted_coins = process_coins()
+                print(inserted_coins)
 
-            # TODO 5. Process coins
             # TODO 6. Check if transaction is successful
             # TODO 7. Make Coffee
 
