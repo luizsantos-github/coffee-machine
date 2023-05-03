@@ -41,18 +41,14 @@ def print_report(resource, current_profit):
     print(f'Money: ${current_profit}')
 
 
-def is_resource_enough(d_water, d_milk, d_coffee, resource):
-    if resource["water"] < d_water:
-        print("Sorry there is not enough water.")
-        return False
-    elif resource["milk"] < d_milk:
-        print("Sorry there is not enough milk.")
-        return False
-    elif resource["coffee"] < d_coffee:
-        print("Sorry there is not enough coffee.")
-        return False
-    else:
-        return True
+def is_resource_enough(recipe, resource):
+    resource_is_enough = True
+    for item in recipe:
+        if resource[item] < recipe[item]:
+            print(f"Sorry there is not enough {item}")
+            resource_is_enough = False
+
+    return resource_is_enough
 
 
 def check_resource(resource, user_choice):
@@ -60,7 +56,7 @@ def check_resource(resource, user_choice):
         print("Command not recognized. Try again")
     else:
         recipe = MENU[user_choice]["ingredients"]
-        return is_resource_enough(recipe["water"], recipe["milk"], recipe["coffee"], resource)
+        return is_resource_enough(recipe, resource)
 
 
 def process_coins():
@@ -74,19 +70,26 @@ def process_coins():
     return math.fsum([quarters + dimes + nickles + pennies])
 
 
-def transaction_successful(chosen_drink):
-    inserted_coins = round(process_coins(), 2)
-    chosen_coffee = MENU[chosen_drink]
-    print(f'Inserted Coins: {inserted_coins}  / Coffee Cost: {chosen_coffee["cost"]}')
+def transaction_successful(inserted_coins, coffee_cost):
+    print(f'Inserted Coins: {inserted_coins}  / Coffee Cost: {coffee_cost}')
 
-    if inserted_coins < chosen_coffee["cost"]:
+    if inserted_coins < coffee_cost:
         return False
     else:
         return True
 
 
+def deduct_resources(resource, user_choice):
+    recipe = MENU[user_choice]["ingredients"]
+    for item in recipe:
+        print(f"Resource: {item}: {resource[item]} - {recipe[item]}")
+        resource[item] = resource[item] - recipe[item]
+    return resource
+
+
 def machine_start():
     global profit
+    global resources
     machine_running = True
 
     while machine_running:
@@ -102,12 +105,19 @@ def machine_start():
         else:
             # Coffe Feature
             if check_resource(resources, user_choice):
-                if transaction_successful(user_choice):
-                    # TODO 7: Make coffee
-                    print("Continue process")
+                inserted_coins = round(process_coins(), 2)
+                coffee_cost = MENU[user_choice]["cost"]
+
+                if transaction_successful(inserted_coins, coffee_cost):
+                    profit += coffee_cost
+                    if inserted_coins > coffee_cost:
+                        print(f"Here's is ${inserted_coins - coffee_cost} dollars in change")
+                    resources = deduct_resources(resources, user_choice)
+                    print(resources)
+                    print("Enjoy your coffee!")
                 else:
                     print("Sorry that's not enough money. Money refunded")
                     machine_running = False
 
-# TODO: Possible Bug, no milk ingredients
+
 machine_start()
